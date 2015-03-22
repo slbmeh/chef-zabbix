@@ -20,7 +20,11 @@ case node['zabbix']['database']['install_method']
 when 'rds_mysql'
   root_username       = node['zabbix']['database']['rds_master_username']
   root_password       = node['zabbix']['database']['rds_master_password']
-  allowed_user_hosts  = '%'
+  allowed_user_hosts  = if node['zabbix']['database']['allowed_user_hosts'] == 'localhost'
+                          '%'
+                        else
+                          node['zabbix']['database']['allowed_user_hosts']
+                        end
   provider = Chef::Provider::ZabbixDatabaseMySql
 when 'mysql'
   unless node['mysql']['server_root_password']
