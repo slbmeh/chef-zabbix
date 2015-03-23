@@ -2,9 +2,17 @@ include_recipe 'zabbix::common'
 
 ::Chef::Recipe.send(:include, Opscode::OpenSSL::Password)
 
-mysql2_chef_gem 'default' do
-  provider node['zabbix']['database']['mysql_provider'] if node['zabbix']['database']['mysql_provider']
-  action :install
+case node['zabbix']['database']['mysql_provider']
+when 'mariadb'
+  mysql2_chef_gem 'default' do
+    provider Chef::Provider::Mysql2ChefGem::Mariadb
+  end
+when 'mysql'
+  mysql2_chef_gem 'default' do
+    provider Chef::Provider::Mysql2ChefGem::Mysql
+  end
+else
+  mysql2_chef_gem 'default'
 end
 
 # Generates passwords if they aren't already set
