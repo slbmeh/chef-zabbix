@@ -3,7 +3,15 @@ include_recipe 'zabbix::common'
 ::Chef::Recipe.send(:include, Opscode::OpenSSL::Password)
 
 mysql2_chef_gem 'default' do
-  provider node['zabbix']['database']['mysql_provider'] if node['zabbix']['database']['mysql_provider']
+  case node['zabbix']['database']['mysql_provider']
+  when 'mysql'
+    provider = Chef::Provider::Mysql2ChefGem::Mysql
+  case 'mariadb'
+    provider = Chef::Provider::Mysql2ChefGem::Mariadb
+  else  
+    provider = Chef::Provider::Mysql2ChefGem::Mysql
+  end
+  provider provider
   action :install
 end
 
