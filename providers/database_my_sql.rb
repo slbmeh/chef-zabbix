@@ -3,7 +3,7 @@ def whyrun_supported?
 end
 
 def load_current_resource
-  require 'mysql'
+  require 'mysql2'
   @current_resource = Chef::Resource::ZabbixDatabase.new(@new_resource.dbname)
   @current_resource.dbname(@new_resource.dbname)
   @current_resource.host(@new_resource.host)
@@ -23,10 +23,10 @@ def database_exists?(dbname, host, port, root_username, root_password)
   exists = false
   db = nil
   begin
-    db = ::Mysql.new(host, root_username, root_password, dbname, port)
+    db = ::Mysql2::Client.new(host: host, username: root_username, password: root_password, port: port, database: dbname)
     exists = true
     Chef::Log.info("Connection to database '#{dbname}' on '#{host}' successful")
-  rescue ::Mysql::Error
+  rescue ::Mysql2::Error
     Chef::Log.info("Connection to database '#{dbname}' on '#{host}' failed")
   ensure
     db.close unless db.nil?
